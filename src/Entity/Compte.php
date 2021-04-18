@@ -92,6 +92,11 @@ class Compte
      */
     private $users;
 
+    /**
+     * @ORM\OneToOne(targetEntity=Balance::class, mappedBy="compte", cascade={"persist", "remove"})
+     */
+    private $balance;
+
     public function __construct()
     {
         $this->contrats = new ArrayCollection();
@@ -303,6 +308,28 @@ class Compte
                 $user->setCompte(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getBalance(): ?Balance
+    {
+        return $this->balance;
+    }
+
+    public function setBalance(?Balance $balance): self
+    {
+        // unset the owning side of the relation if necessary
+        if ($balance === null && $this->balance !== null) {
+            $this->balance->setCompte(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($balance !== null && $balance->getCompte() !== $this) {
+            $balance->setCompte($this);
+        }
+
+        $this->balance = $balance;
 
         return $this;
     }
