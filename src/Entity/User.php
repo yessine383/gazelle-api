@@ -35,24 +35,13 @@ class User implements UserInterface
      * @ORM\Column(type="string")
      */
     private $password;
-    private $plainpassword;
+
 
     /**
      * @ORM\ManyToOne(targetEntity=Compte::class, inversedBy="users")
      */
     private $compte;
 
-    public function getPlainPassword(): string
-    {
-        return $this->plainpassword;
-    }
-
-    public function setPlainPassword(string $plainpassword): self
-    {
-        $this->password = $plainpassword;
-
-        return $this;
-    }
 
 
 
@@ -134,7 +123,7 @@ class User implements UserInterface
     public function eraseCredentials()
     {
         // If you store any temporary, sensitive data on the user, clear it here
-        $this->plainPassword = null;
+        $this->password = null;
     }
 
     public function getCompte(): ?Compte
