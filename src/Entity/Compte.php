@@ -53,7 +53,7 @@ class Compte
     private $proprietaire;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="integer", length=255, nullable=true)
      */
     private $responsable;
 
@@ -87,20 +87,32 @@ class Compte
      */
     private $contrats;
 
-    /**
-     * @ORM\OneToMany(targetEntity=User::class, mappedBy="compte")
-     */
-    private $users;
+
 
     /**
-     * @ORM\OneToOne(targetEntity=Balance::class, mappedBy="compte", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity=Reclamation::class, mappedBy="compteid")
+     */
+    private $reclamations;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
      */
     private $balance;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Transaction::class, mappedBy="compte")
+     */
+    private $transactions;
+
+
+
 
     public function __construct()
     {
         $this->contrats = new ArrayCollection();
         $this->users = new ArrayCollection();
+        $this->reclamations = new ArrayCollection();
+        $this->transactions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -283,53 +295,73 @@ class Compte
     }
 
     /**
-     * @return Collection|User[]
+     * @return Collection|Reclamation[]
      */
-    public function getUsers(): Collection
+    public function getReclamations(): Collection
     {
-        return $this->users;
+        return $this->reclamations;
     }
 
-    public function addUser(User $user): self
+    public function addReclamation(Reclamation $reclamation): self
     {
-        if (!$this->users->contains($user)) {
-            $this->users[] = $user;
-            $user->setCompte($this);
+        if (!$this->reclamations->contains($reclamation)) {
+            $this->reclamations[] = $reclamation;
+            $reclamation->setCompteid($this);
         }
 
         return $this;
     }
 
-    public function removeUser(User $user): self
+    public function removeReclamation(Reclamation $reclamation): self
     {
-        if ($this->users->removeElement($user)) {
+        if ($this->reclamations->removeElement($reclamation)) {
             // set the owning side to null (unless already changed)
-            if ($user->getCompte() === $this) {
-                $user->setCompte(null);
+            if ($reclamation->getCompteid() === $this) {
+                $reclamation->setCompteid(null);
             }
         }
 
         return $this;
     }
 
-    public function getBalance(): ?Balance
+    public function getBalance(): ?float
     {
         return $this->balance;
     }
 
-    public function setBalance(?Balance $balance): self
+    public function setBalance(?float $balance): self
     {
-        // unset the owning side of the relation if necessary
-        if ($balance === null && $this->balance !== null) {
-            $this->balance->setCompte(null);
-        }
-
-        // set the owning side of the relation if necessary
-        if ($balance !== null && $balance->getCompte() !== $this) {
-            $balance->setCompte($this);
-        }
-
         $this->balance = $balance;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Transaction[]
+     */
+    public function getTransactions(): Collection
+    {
+        return $this->transactions;
+    }
+
+    public function addTransaction(Transaction $transaction): self
+    {
+        if (!$this->transactions->contains($transaction)) {
+            $this->transactions[] = $transaction;
+            $transaction->setCompte($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTransaction(Transaction $transaction): self
+    {
+        if ($this->transactions->removeElement($transaction)) {
+            // set the owning side to null (unless already changed)
+            if ($transaction->getCompte() === $this) {
+                $transaction->setCompte(null);
+            }
+        }
 
         return $this;
     }

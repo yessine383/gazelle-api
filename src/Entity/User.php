@@ -6,10 +6,11 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
- * @ApiResource
+ * @ApiResource()
  */
 class User implements UserInterface
 {
@@ -31,18 +32,24 @@ class User implements UserInterface
     private $roles = [];
 
     /**
-     * @var string The hashed password
-     * @ORM\Column(type="string")
+     
+     * @ORM\Column(type="string", nullable=true)
      */
     private $password;
 
-
     /**
-     * @ORM\ManyToOne(targetEntity=Compte::class, inversedBy="users")
+     * @ORM\ManyToOne(targetEntity="Compte")
+     * @ORM\JoinColumn(name="Compte_id",referencedColumnName="id")
      */
     private $compte;
 
 
+
+
+    /**
+     * @SerializedName("password")
+     */
+    public $plainPassword;
 
 
     public function getId(): ?int
@@ -105,6 +112,17 @@ class User implements UserInterface
 
         return $this;
     }
+    public function getPlainPassword(): string
+    {
+        return (string) $this->password;
+    }
+
+    public function setPlainPassword(string $password): self
+    {
+        $this->password = $password;
+
+        return $this;
+    }
 
     /**
      * Returning a salt is only needed, if you are not using a modern
@@ -124,17 +142,5 @@ class User implements UserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         $this->password = null;
-    }
-
-    public function getCompte(): ?Compte
-    {
-        return $this->compte;
-    }
-
-    public function setCompte(?Compte $compte): self
-    {
-        $this->compte = $compte;
-
-        return $this;
     }
 }
