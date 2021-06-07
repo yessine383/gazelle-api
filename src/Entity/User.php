@@ -43,9 +43,6 @@ class User implements UserInterface
      */
     private $compte;
 
-
-
-
     /**
      * @SerializedName("password")
      */
